@@ -64,5 +64,18 @@
             return document.getElementsByName(volum_to_score.toString());
         }
 
+        function addAnimation(element) {
+
+        }
+
+        function volumToAnimation(volum) {
+            var elements = getImgsByVolum(volum);
+            if (elements) {
+                for (var ele in elements) {
+                    addAnimation(ele);
+                }
+            }
+        }
+
     </script>
 </body>
