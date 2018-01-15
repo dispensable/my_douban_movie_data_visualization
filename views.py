@@ -25,7 +25,7 @@ def index():
             movies_data[movie['name']] = {}
             movies_data[movie['name']]['score'] = movie['score']
             movies_data[movie['name']]['img_filename'] = movie['img_filename']
-    print(movies_data)
+    
     return {'movies_data': movies_data}
 
 

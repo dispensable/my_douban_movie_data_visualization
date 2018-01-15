@@ -14,7 +14,7 @@
 
     {% for name, metadata in movies_data.iteritems() %}
         <img src='../poster_img/{{metadata.img_filename}}' 
-            alt="{{name}}" id="{{name}}" score="{{metadata.score}}"/>
+            alt="{{name}}" id="{{name}}" name="{{metadata.score}}"/>
     {% endfor %}
 
 
@@ -57,5 +57,12 @@
                 }
             };
         }
+
+        function getImgsByVolum(volum) {
+            var volum_to_score = (volum / 10).toFixed(1);
+            console.log('volum to score: ' + volum_to_score.toString());
+            return document.getElementsByName(volum_to_score.toString());
+        }
+
     </script>
 </body>
