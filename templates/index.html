@@ -91,9 +91,9 @@
                 console.log('no moive in this score ...');
                 return;
             } else {
-                start_or_stop();
+                anim.stop();
                 redraw('../poster_img/' + movies_data_by_score[score][0]['img_filename']);
-                start_or_stop();
+                anim.start();
             }
             ignore_noise = true;
         }
