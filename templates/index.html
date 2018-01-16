@@ -32,10 +32,11 @@
     </div>
     
     <script>
-        mystatus = document.getElementById("status")
+        movies_data_by_score = JSON.decode('{{score_dict}}');
+        mystatus = document.getElementById("status");
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
         if(!navigator.getUserMedia){
-            mystatus.innerHTML = "您的浏览器不支持获取音频。"
+            mystatus.innerHTML = "您的浏览器不支持获取音频。";
         }
 
         //调用麦克风捕捉音频信息，成功时触发onSuccess函数，失败时触发onError函数
@@ -68,25 +69,23 @@
                 //    mystatus.innerHTML = "您的声音太响了!!";
                 //    liveSource.disconnect(levelChecker);
                 //}
+
+                if (maxVal < 50) {
+                    return;
+                } else {
+                    volumToMovies(maxVal);
+                }
             };
         }
 
-        function getImgsByVolum(volum) {
-            var volum_to_score = (volum / 10).toFixed(1);
-            console.log('volum to score: ' + volum_to_score.toString());
-            return document.getElementsByName(volum_to_score.toString());
-        }
-
-        function addAnimation(element) {
-
-        }
-
-        function volumToAnimation(volum) {
-            var elements = getImgsByVolum(volum);
-            if (elements) {
-                for (var ele in elements) {
-                    addAnimation(ele);
-                }
+        function volumToMovies(volum) {
+            var score = (volum / 10).toFixed(1).toString();
+            if (!(score in movies_data_by_score)) {
+                return;
+            } else {
+                start_or_stop();
+                redraw('../poster_img/' + movies_data_by_score[score][0]['img_filename']);
+                start_or_stop();
             }
         }
 

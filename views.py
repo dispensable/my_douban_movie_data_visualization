@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-import re, os
+import re, os, json
 
 from bottle import jinja2_view, route, run, static_file
 from utils import MongoCon
@@ -25,9 +25,16 @@ def index():
             movies_data[movie['name']] = {}
             movies_data[movie['name']]['score'] = movie['score']
             movies_data[movie['name']]['img_filename'] = movie['img_filename']
-            movies_data[movie['name']]['style'] = "animation: 1s rainbow forwards; "
     
-    return {'movies_data': movies_data}
+    # score dict
+    score_dict = {}
+    for key, value in movies_data:
+        score = value['score']
+        if not score_dict.get(score, ''):
+            score_dict[score] = []
+        score_dict[score].append({'name': key, 'img_filename': value['img_filename']})
+
+    return {'movies_data': movies_data, 'score_dict': json.dumps(score_dict)}
 
 
 @route('/poster_img/<filename>')
