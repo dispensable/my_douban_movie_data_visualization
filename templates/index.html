@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://cdn.rawgit.com/konvajs/konva/1.7.6/konva.min.js"></script>
+    <script src="../poster_img/konva.min.js"></script>
     <meta charset="UTF-8">
     <title>海报测试</title>
 
@@ -16,13 +16,13 @@
 <head>
 
 <body>
-    <h1>test movies data image</h1>
+    <h1 style="color: white">test movies data image</h1>
 
     <div id="status">
-        volum: <strong id='status_num' style="background: white">0</strong>
-        <button onclick="redraw('../poster_img/p2416606535.jpg')">画图</button>
-        <button onclick="start_or_stop()">暂停/开始</button>
+        <span style="color: white">volum: <strong id='status_num' style="color: white;">0</strong></span>
     </div>
+    <button onclick="redraw('../poster_img/p2416606535.jpg')">画图</button>
+    <button onclick="start_or_stop()">暂停/开始</button>
 
     <div id="container">
         <!-- {% for name, metadata in movies_data.iteritems() %}
@@ -35,7 +35,7 @@
         ignore_noise = false;
         movies_data_by_score = JSON.parse('{{score_dict}}');
         console.log(movies_data_by_score);
-        mystatus = document.getElementById("status");
+        mystatus = document.getElementById("status_num");
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
         if(!navigator.getUserMedia){
             mystatus.innerHTML = "您的浏览器不支持获取音频。";
@@ -71,10 +71,12 @@
                 //    mystatus.innerHTML = "您的声音太响了!!";
                 //    liveSource.disconnect(levelChecker);
                 //}
-
+                maxVal = maxVal * 100;
                 if (maxVal < 20) {
                     return;
                 } else {
+                    ignore_noise = false;
+                    console.log("get noise ... ");
                     if (!ignore_noise) {
                         ignore_noise = false;
                         volumToMovies(maxVal);
@@ -87,6 +89,7 @@
 
         function volumToMovies(volum) {
             var score = (volum / 10).toFixed(1).toString();
+            console.log('get volum : ' + score);
             if (!(score in movies_data_by_score)) {
                 console.log('no moive in this score ...');
                 return;
