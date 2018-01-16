@@ -28,11 +28,11 @@ def index():
     
     # score dict
     score_dict = {}
-    for key, value in movies_data:
-        score = value['score']
+    for key, value in movies_data.items():
+        score = str(value['score'])
         if not score_dict.get(score, ''):
             score_dict[score] = []
-        score_dict[score].append({'name': key, 'img_filename': value['img_filename']})
+        score_dict[score].append({'name': key.replace("'", ''), 'img_filename': value['img_filename']})
 
     return {'movies_data': movies_data, 'score_dict': json.dumps(score_dict)}
 

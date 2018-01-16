@@ -32,7 +32,9 @@
     </div>
     
     <script>
-        movies_data_by_score = JSON.decode('{{score_dict}}');
+        ignore_noise = false;
+        movies_data_by_score = JSON.parse('{{score_dict}}');
+        console.log(movies_data_by_score);
         mystatus = document.getElementById("status");
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
         if(!navigator.getUserMedia){
@@ -51,7 +53,7 @@
             audioContext = window.AudioContext || window.webkitAudioContext;
             context = new audioContext(); //创建一个管理、播放声音的对象
             liveSource = context.createMediaStreamSource(stream); //将麦克风的声音输入这个对象
-            var levelChecker = context.createScriptProcessor(40960,1,1); //创建一个音频分析对象，采样的缓冲区大小为4096，输入和输出都是单声道
+            var levelChecker = context.createScriptProcessor(16384, 1, 1); //创建一个音频分析对象，采样的缓冲区大小为4096，输入和输出都是单声道
             liveSource.connect(levelChecker); //将该分析对象与麦克风音频进行连接
             levelChecker.onaudioprocess = function(e) { //开始处理音频
                 var buffer = e.inputBuffer.getChannelData(0); //获得缓冲区的输入音频，转换为包含了PCM通道数据的32位浮点数组
@@ -70,10 +72,15 @@
                 //    liveSource.disconnect(levelChecker);
                 //}
 
-                if (maxVal < 50) {
+                if (maxVal < 20) {
                     return;
                 } else {
-                    volumToMovies(maxVal);
+                    if (!ignore_noise) {
+                        ignore_noise = false;
+                        volumToMovies(maxVal);
+                    } else {
+                        console.log('ignoring noise cause there is a show already...');
+                    }
                 }
             };
         }
@@ -81,12 +88,14 @@
         function volumToMovies(volum) {
             var score = (volum / 10).toFixed(1).toString();
             if (!(score in movies_data_by_score)) {
+                console.log('no moive in this score ...');
                 return;
             } else {
                 start_or_stop();
                 redraw('../poster_img/' + movies_data_by_score[score][0]['img_filename']);
                 start_or_stop();
             }
+            ignore_noise = true;
         }
 
         function redraw(img_src) {
