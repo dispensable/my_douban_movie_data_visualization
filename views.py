@@ -17,7 +17,7 @@ def index():
     """
     # 过滤对应类型的电影，并生成需要的数据
     movies_data = {}
-    movies_to_show_re = re.compile(r".?惊悚|恐怖.?")
+    movies_to_show_re = re.compile(r".?恐怖.?")
     with MongoCon() as movie_db:
         movies_to_show = movie_db.find({"type": movies_to_show_re})
         
@@ -25,6 +25,7 @@ def index():
             movies_data[movie['name']] = {}
             movies_data[movie['name']]['score'] = movie['score']
             movies_data[movie['name']]['img_filename'] = movie['img_filename']
+            movies_data[movie['name']]['style'] = "animation: 1s rainbow forwards; "
     
     return {'movies_data': movies_data}
 

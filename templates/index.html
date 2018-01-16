@@ -1,23 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://cdn.rawgit.com/konvajs/konva/1.7.6/konva.min.js"></script>
     <meta charset="UTF-8">
     <title>海报测试</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: rgb(0, 0, 0);
+        }
+    </style>
 <head>
 
 <body>
     <h1>test movies data image</h1>
 
     <div id="status">
-        volum: <strong id='status_num'>0</strong>
+        volum: <strong id='status_num' style="background: white">0</strong>
+        <button onclick="redraw('../poster_img/p2416606535.jpg')">画图</button>
+        <button onclick="start_or_stop()">暂停/开始</button>
     </div>
 
-    {% for name, metadata in movies_data.iteritems() %}
-        <img src='../poster_img/{{metadata.img_filename}}' 
-            alt="{{name}}" id="{{name}}" name="{{metadata.score}}"/>
-    {% endfor %}
-
-
+    <div id="container">
+        <!-- {% for name, metadata in movies_data.iteritems() %}
+            <img src='../poster_img/{{metadata.img_filename}}' 
+                alt="{{name}}" id="{{name}}" name="{{metadata.score}}"/>
+        {% endfor %} -->
+    </div>
+    
     <script>
         mystatus = document.getElementById("status")
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
@@ -37,7 +50,7 @@
             audioContext = window.AudioContext || window.webkitAudioContext;
             context = new audioContext(); //创建一个管理、播放声音的对象
             liveSource = context.createMediaStreamSource(stream); //将麦克风的声音输入这个对象
-            var levelChecker = context.createScriptProcessor(4096,1,1); //创建一个音频分析对象，采样的缓冲区大小为4096，输入和输出都是单声道
+            var levelChecker = context.createScriptProcessor(40960,1,1); //创建一个音频分析对象，采样的缓冲区大小为4096，输入和输出都是单声道
             liveSource.connect(levelChecker); //将该分析对象与麦克风音频进行连接
             levelChecker.onaudioprocess = function(e) { //开始处理音频
                 var buffer = e.inputBuffer.getChannelData(0); //获得缓冲区的输入音频，转换为包含了PCM通道数据的32位浮点数组
@@ -50,11 +63,11 @@
                 }
                 //显示音量值
                 mystatus.innerHTML = "您的音量值："+Math.round(maxVal*100);
-                if(maxVal>.5){
+                //if(maxVal>.5){
                     //当音量值大于0.5时，显示“声音太响”字样，并断开音频连接
-                    mystatus.innerHTML = "您的声音太响了!!";
-                    liveSource.disconnect(levelChecker);
-                }
+                //    mystatus.innerHTML = "您的声音太响了!!";
+                //    liveSource.disconnect(levelChecker);
+                //}
             };
         }
 
@@ -77,5 +90,101 @@
             }
         }
 
+        function redraw(img_src) {
+            anim.stop();
+            var layer = new Konva.Layer();
+            var redraw_img = new Image();
+            redraw_img.src = img_src;
+            var knova_imag = new Konva.Image({
+                x: width * 0.5,
+                y: height * 0.3,
+                image: redraw_img,
+                width: 206 * 1.2,
+                height: 318 * 1.2,
+                shadowBlur: 100
+            });
+            layer.add(knova_imag);
+            stage.add(layer);
+            setTimeout(function() {layer.destroy()}, 5000);
+        }
+
+        function start_or_stop() {
+            if (anim.isRunning()) {
+                anim.stop();
+            } else {
+                anim.start();
+            }
+        }
+
+        // draw all image on the canvas
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+
+        var stage = new Konva.Stage({
+            container: 'container',
+            width: width,
+            height: height
+        });
+
+        var layer = new Konva.Layer();
+        var images_src = [{% for name, metadata in movies_data.iteritems() %} '../poster_img/{{metadata.img_filename}}', {% endfor %}];
+        var images_obj = [];
+        var images_status = [];
+        console.log(images_src);
+        
+        for (var i=0; i<images_src.length; i++) {
+            var imgobj = new Image();
+            imgobj.src = images_src[i];
+            var poster = new Konva.Image({
+                x: width * Math.random(),
+                y: height * Math.random(),
+                image: imgobj,
+                width: 206,
+                height: 318,
+                shadowBlur: 40,})
+            layer.add(poster);
+            images_obj.push(poster);
+            images_status.push(i % 2);
+        }
+
+        stage.add(layer);
+
+        // shake it baby!
+        var amplitude = 100000;
+        var period = 20000;
+        // in ms
+        var centerX = stage.getWidth() / 2;
+
+        // width and height
+        console.log('width: ', width);
+        console.log('height: ', height);
+        var anim = new Konva.Animation(function(frame) {
+            for (var k=0; k<images_obj.length; k++) {
+                var poster = images_obj[k];
+                var poster_x = poster.x();
+                var poster_y = poster.y();
+                var delta = 20 / frame.frameRate;
+                
+                // poster.x(Math.random() * amplitude * Math.sin(frame.time * 2 * Math.PI / period) + centerX);
+                if (poster_x > width || poster_y > height) {
+                    images_status[k] = 1;
+                } 
+
+                if (poster_x < 0 || height < 0) {
+                    images_status[k] = 0;
+                }
+
+                if (images_status[k] === 0) {
+                    poster.x(poster_x + delta);
+                    //poster.y(poster_y + delta * Math.random());
+                } else if (images_status[k] === 1) {
+                    poster.x(poster_x - delta);
+                    //poster.y(poster_y - delta * Math.random());
+                }
+            }
+        }, layer);
+
+        anim.start();
+        
     </script>
 </body>
