@@ -3,7 +3,7 @@
 <head>
     <script src="../poster_img/konva.min.js"></script>
     <meta charset="UTF-8">
-    <title>海报测试</title>
+    <title>speak to me </title>
 
     <style>
         body {
@@ -16,14 +16,11 @@
 <head>
 
 <body>
-    <h1 style="color: white">test movies data image</h1>
-
-    <div id="status">
-        <span style="color: white">volum: <strong id='status_num' style="color: white;">0</strong></span>
+    <!-- <div id="status">
+            <span style="color: white">volum: <strong id='status_num' style="color: white;">0</strong></span>
     </div>
     <button onclick="redraw('../poster_img/p2416606535.jpg')">画图</button>
-    <button onclick="start_or_stop()">暂停/开始</button>
-
+    <button onclick="start_or_stop()">暂停/开始</button> -->
     <div id="container">
         <!-- {% for name, metadata in movies_data.iteritems() %}
             <img src='../poster_img/{{metadata.img_filename}}' 
@@ -107,16 +104,24 @@
             var redraw_img = new Image();
             redraw_img.src = img_src;
             var knova_imag = new Konva.Image({
-                x: width * 0.5,
-                y: height * 0.3,
+                x: (width * 0.5) - 206,
+                y: (height * 0.5) - 318,
                 image: redraw_img,
-                width: 206 * 1.2,
-                height: 318 * 1.2,
-                shadowBlur: 100
+                width: 206 * 2,
+                height: 318 * 2,
+                shadowBlur: 100,
             });
             layer.add(knova_imag);
             stage.add(layer);
-            setTimeout(function() {layer.destroy()}, 5000);
+
+            var scaleInterval = setInterval(function() {
+                knova_imag.scaleX(1.1);
+                knova_imag.scaleY(1.1);
+                knova_imag.x(width * 0.5 - knova_imag.width() / 2);
+                knova_imag.y(height * 0.5 - knova_imag.height() / 2);
+                layer.draw();
+            }, 1000);
+            setTimeout(function() {window.clearInterval(scaleInterval); layer.destroy()}, 5000);
         }
 
         function start_or_stop() {
@@ -176,21 +181,26 @@
                 var poster_y = poster.y();
                 var delta = 20 / frame.frameRate;
                 
-                // poster.x(Math.random() * amplitude * Math.sin(frame.time * 2 * Math.PI / period) + centerX);
-                if (poster_x > width || poster_y > height) {
+                // 改变运动状态
+                if (poster_x > (width - 206)|| poster_y > (height - 318)) {
                     images_status[k] = 1;
                 } 
 
-                if (poster_x < 0 || height < 0) {
+                if (poster_x < 0 || poster_y < 0) {
                     images_status[k] = 0;
                 }
 
                 if (images_status[k] === 0) {
-                    poster.x(poster_x + delta);
-                    //poster.y(poster_y + delta * Math.random());
+                    if (Math.random() > 0.5) {
+                        poster.x(poster_x + delta * Math.random());
+                    }
+                    poster.y(poster_y + delta * Math.random());
+                    
                 } else if (images_status[k] === 1) {
-                    poster.x(poster_x - delta);
-                    //poster.y(poster_y - delta * Math.random());
+                    if (Math.random() > 0.5) {
+                        poster.x(poster_x - delta * Math.random());
+                    }
+                    poster.y(poster_y - delta * Math.random());
                 }
             }
         }, layer);

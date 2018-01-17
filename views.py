@@ -19,7 +19,7 @@ def index():
     movies_data = {}
     movies_to_show_re = re.compile(r".?恐怖.?")
     with MongoCon() as movie_db:
-        movies_to_show = movie_db.find({"type": movies_to_show_re})
+        movies_to_show = movie_db.find({"type": movies_to_show_re}).limit(80)
         
         for movie in movies_to_show:
             movies_data[movie['name']] = {}
