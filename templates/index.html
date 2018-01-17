@@ -16,16 +16,19 @@
 <head>
 
 <body>
-    <!-- <div id="status">
-            <span style="color: white">volum: <strong id='status_num' style="color: white;">0</strong></span>
-    </div>
-    <button onclick="redraw('../poster_img/p2416606535.jpg')">画图</button>
-    <button onclick="start_or_stop()">暂停/开始</button> -->
+
     <div id="container">
         <!-- {% for name, metadata in movies_data.iteritems() %}
             <img src='../poster_img/{{metadata.img_filename}}' 
                 alt="{{name}}" id="{{name}}" name="{{metadata.score}}"/>
         {% endfor %} -->
+<!--         <div id="status">
+                <span style="color: white">volum: <strong id='status_num' style="color: white;">0</strong></span>
+        </div>
+        <button onclick="redraw('../poster_img/p2416606535.jpg')">画图</button>
+        <button onclick="volumToMovies(61)">模拟声音</button>
+        <button onclick="volumToMovies(43)">模拟声音</button>
+        <button onclick="start_or_stop()">暂停/开始</button> -->
     </div>
     
     <script>
@@ -86,9 +89,35 @@
 
         function volumToMovies(volum) {
             var score = (volum / 10).toFixed(1).toString();
+
+            // 因为没有１０分的电影，所以用最高分的电影来代替
+            if (score === '10.0') {
+                score = '9.3';
+            }
+
             console.log('get volum : ' + score);
             if (!(score in movies_data_by_score)) {
-                console.log('no moive in this score ...');
+                var all_scores = Object.keys(movies_data_by_score);
+                console.log(all_scores);
+                var score_num = parseFloat(score);
+                
+                // 找到最接近的得分
+                var score_delta = 10;
+                var score_index = 0;
+                for (var i=0; i<all_scores.length; i++) {
+                    var score_tmp_data = (parseFloat(all_scores[i]) - score_num);
+                    
+                    if (score_tmp_data < score_delta && score_tmp_data > 0) {
+                        score_delta = score_tmp_data;
+                        score_index = i;
+                    }
+                }
+                score = all_scores[score_index];
+                anim.stop();
+                console.log('selected: ' + score);
+                redraw('../poster_img/' + movies_data_by_score[score][0]['img_filename']);
+                anim.start();
+                ignore_noise = true;
                 return;
             } else {
                 anim.stop();
